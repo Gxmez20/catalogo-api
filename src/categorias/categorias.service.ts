@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Categoria, CategoriaDocument } from './categorias.schema';
+import { Producto, ProductoDocument } from '../productos/productos.schema';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 
@@ -9,6 +10,7 @@ import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 export class CategoriasService {
   constructor(
     @InjectModel(Categoria.name) private categoriaModel: Model<CategoriaDocument>,
+    @InjectModel(Producto.name) private productoModel: Model<ProductoDocument>,
   ) {}
 
   async create(dto: CreateCategoriaDto): Promise<Categoria> {
@@ -35,8 +37,17 @@ export class CategoriasService {
   }
 
   async remove(id: string): Promise<Categoria> {
-    const categoria = await this.categoriaModel.findByIdAndDelete(id);
+    const categoria = await this.categoriaModel.findById(id);
     if (!categoria) throw new NotFoundException(`La categoría con id ${id} no existe`);
+
+    const productosAsociados = await this.productoModel.countDocuments({ categoria: id });
+    if (productosAsociados > 0) {
+      throw new ConflictException(
+        `No se puede eliminar la categoría porque tiene ${productosAsociados} producto(s) asociado(s)`,
+      );
+    }
+
+    await this.categoriaModel.findByIdAndDelete(id);
     return categoria;
   }
 }
