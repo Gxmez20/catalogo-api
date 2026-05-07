@@ -1,0 +1,15 @@
+info:
+  name: Desactivar producto
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/productos/{{productoId}}/desactivar"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
