@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Producto, ProductoDocument } from './productos.schema';
@@ -8,6 +8,7 @@ import { CategoriasService } from '../categorias/categorias.service';
 
 @Injectable()
 export class ProductosService {
+
   constructor(
     @InjectModel(Producto.name) private productoModel: Model<ProductoDocument>,
     private readonly categoriasService: CategoriasService,
